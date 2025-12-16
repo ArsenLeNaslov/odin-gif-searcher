@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="description" content="A GIF Searcher page">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/5362/5362497.png"><title>GIF Searcher</title>
+</head>
+<body>
+  <style>
+    body {
+      background-color: #3b175d;
+      background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239800a1' fill-opacity='0.22'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      display: flex;
+      height: 90vh;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #searchBtn:hover,
+    #newBtn:hover {
+      background-color: #7a0080;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(229, 242, 39, 0.3);
+      transition: all 0.2s ease;
+    }
+  </style>
+
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search for gifs..." 
+        style="padding: 10px 15px; font-size: 16px; border: 2px solid #9800a1; border-radius: 5px; width: 250px;"
+>
+      <button 
+        id="searchBtn"
+        style="padding: 10px 20px; font-size: 16px; background-color: #9800a1; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        Search
+        </button>
+    </div>
+
+    <img src="#" alt="gif" style="max-width: 500px; max-height: 500px; border-radius: 15px;">
+    <button 
+      id="newBtn"
+      style="padding: 10px 20px; font-size: 16px; background-color: #9800a1; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+      Get New GIF
+    </button>
+    <div id="errorMsg" style="color: red; font-weight: bold; display: none;"></div>
+    
+    <footer class="footer">
+      <p>Created by <a href="https://github.com/ArsenLeNaslov" target="_blank" rel="noopener noreferrer">ArsenLeNaslov</a> for The Odin Project 🎴 </p>
+    </footer>
+  </div>
+
+  <script>
+  const img = document.querySelector('img');
+  const newBtn = document.getElementById('newBtn');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchInput = document.getElementById('searchInput');
+  const errorMsg = document.getElementById('errorMsg');
+  const apiKey = 'GwZLJnbbnhuJb312Jqm6XhqeUgMRijFy';
+  
+  let currentSearchTerm = null;
+  let currentSearchResults = [];
+
+  function clearError() {
+    errorMsg.style.display = 'none';
+    errorMsg.textContent = '';
+  }
+
+  function showError(message) {
+    errorMsg.textContent = message;
+    errorMsg.style.display = 'block';
+  }
+
+  async function fetchGif(searchTerm = 'cat', isRandomFetch = false) {
+    clearError();
+    
+    try {
+      // Use translate endpoint for random fetches (always returns different results)
+      // Use search endpoint for user searches (fetch multiple results for cycling)
+      const endpoint = isRandomFetch
+        ? `https://api.giphy.com/v1/gifs/translate?api_key=${apiKey}&s=${encodeURIComponent(searchTerm)}`
+        : `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(searchTerm)}&limit=10`;
+
+      const response = await fetch(endpoint, { mode: 'cors' });
+      
+      // Check if the response status is okay
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Check if data exists
+      if (!data.data || (Array.isArray(data.data) && data.data.length === 0)) {
+        throw new Error('No GIFs found for your search. Try a different term!');
+      }
+      
+      // Handle both translate (single object) and search (array) responses
+      const gifData = Array.isArray(data.data) ? data.data[0] : data.data;
+      
+      if (!gifData.images || !gifData.images.original || !gifData.images.original.url) {
+        throw new Error('Invalid GIF data received from API');
+      }
+      
+      // Store results and search term for search requests
+      if (!isRandomFetch && Array.isArray(data.data)) {
+        currentSearchResults = data.data;
+        currentSearchTerm = searchTerm;
+      }
+      
+      img.src = gifData.images.original.url;
+    } catch (e) {
+      console.error('Error fetching GIF:', e);
+      showError(`Error: ${e.message}`);
+      img.src = '#';
+    }
+  }
+
+  // Event listeners
+  newBtn.addEventListener('click', function() {
+    // If user has searched, show random GIF from search results
+    if (currentSearchTerm && currentSearchResults.length > 0) {
+      const randomIndex = Math.floor(Math.random() * currentSearchResults.length);
+      const gifData = currentSearchResults[randomIndex];
+      if (gifData.images && gifData.images.original && gifData.images.original.url) {
+        img.src = gifData.images.original.url;
+      }
+    } else {
+      // Otherwise, fetch random cat GIF
+      fetchGif('cat', true);
+    }
+  });
+
+  searchBtn.addEventListener('click', function() {
+    const searchTerm = searchInput.value;
+    if (searchTerm.trim()) {
+      fetchGif(searchTerm);
+    } else {
+      showError('Please enter a search term');
+    }
+  });
+
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      searchBtn.click();
+    }
+  });
+
+  // Load initial GIF
+  fetchGif('cat', true);  // true means random fetch using translate endpoint
+</script>
+</body>
+</html>
