@@ -1,2 +1,1 @@
-# odin-gif-searcher
-Odin's GIF searcher
+# Odin's GIF searcher
