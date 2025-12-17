@@ -2,13 +2,14 @@
 
 A small client-side web application built to practice working with external APIs using the Fetch API. It allows users to dynamically retrieve and display GIFs without reloading the page, reinforcing core concepts such as asynchronous JavaScript, promise handling, and basic error management.
 
-Referencing Odin's Assignment: [To Do List App](https://www.theodinproject.com/lessons/node-path-javascript-todo-list)
+Referencing Odin's Assignment: [Working with APIs](https://www.theodinproject.com/lessons/node-path-javascript-working-with-apis)
 
-Live preview https://arsenlenaslov.github.io/odin-gif-searcher/
+Live preview: [Odin's GIF Searcher](https://arsenlenaslov.github.io/odin-gif-searcher/)
 
 <img width="1429" height="1187" alt="image" src="https://github.com/user-attachments/assets/43009453-1f47-4f16-9e6b-32de0b936d19" />
 
-#Features
+
+##Features
 - **Fetches GIFs** from a public GIF API using the Fetch API. Reference: [MDN Web Docs, Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 - **Displays a GIF** on page load and updates the image dynamically when requested, demonstrating DOM manipulation combined with asynchronous data fetching.
 - **Includes a search input** that lets users query GIFs by keyword
