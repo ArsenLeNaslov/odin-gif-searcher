@@ -9,7 +9,7 @@ Live preview: [Odin's GIF Searcher](https://arsenlenaslov.github.io/odin-gif-sea
 <img width="1429" height="1187" alt="image" src="https://github.com/user-attachments/assets/43009453-1f47-4f16-9e6b-32de0b936d19" />
 
 
-##Features
+## Features
 - **Fetches GIFs** from a public GIF API using the Fetch API. Reference: [MDN Web Docs, Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 - **Displays a GIF** on page load and updates the image dynamically when requested, demonstrating DOM manipulation combined with asynchronous data fetching.
 - **Includes a search input** that lets users query GIFs by keyword
